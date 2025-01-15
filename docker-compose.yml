@@ -1,0 +1,102 @@
+version: '3.8'
+
+# https://docs.docker.com/compose/compose-file/
+
+services:
+  persons:
+    build: ./backend/persons
+    ports:
+      - 8001:80
+    networks:
+      pact-wars:
+        aliases:
+          - persons
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+  planets:
+    build: ./backend/planets
+    ports:
+      - 8002:8080
+    networks:
+      pact-wars:
+        aliases:
+          - planets
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+  spaceships:
+    build: ./backend/spaceships
+    ports:
+      - 8003:8080
+    networks:
+      pact-wars:
+        aliases:
+          - spaceships
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+  frontend:
+      build: ./frontend
+      ports:
+      - 8000:80
+      networks:
+        - pact-wars
+      depends_on:
+        - persons
+        - spaceships
+        - planets
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - "./messagingconf:/etc/rabbitmq"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_running"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - pact-wars
+  postgres:
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=pactwars
+      - POSTGRES_PASSWORD=pactwars
+      - POSTGRES_DB=pactwars
+    volumes:
+      - "./dbinit:/docker-entrypoint-initdb.d"
+    healthcheck:
+      test: ["CMD", "pg_isready", "--user=pactwars"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - pact-wars
+  pactbroker:
+    image: dius/pact-broker:latest
+    ports:
+      - 8005:80
+    networks:
+      - pact-wars
+    depends_on:
+      - postgres
+    environment:
+      - PACT_BROKER_DATABASE_HOST=postgres
+      - PACT_BROKER_DATABASE_NAME=pactwars
+      - PACT_BROKER_DATABASE_USERNAME=pactwars
+      - PACT_BROKER_DATABASE_PASSWORD=pactwars
+networks:
+  pact-wars:

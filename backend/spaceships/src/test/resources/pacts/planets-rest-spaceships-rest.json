@@ -1,0 +1,128 @@
+{
+  "consumer": {
+    "name": "planets-rest"
+  },
+  "interactions": [
+    {
+      "description": "GET request to non-existing spaceships on planet 2",
+      "providerStates": [
+        {
+          "name": "has no ships on planet 2"
+        }
+      ],
+      "request": {
+        "matchingRules": {
+          "query": {
+            "planetId": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "\\d*"
+                }
+              ]
+            }
+          }
+        },
+        "method": "GET",
+        "path": "/spaceships",
+        "query": {
+          "planetId": [
+            "2"
+          ]
+        }
+      },
+      "response": {
+        "body": [
+
+        ],
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "status": 200
+      }
+    },
+    {
+      "description": "GET request to existing spaceships on planet 1",
+      "providerStates": [
+        {
+          "name": "has ships on planet 1"
+        }
+      ],
+      "request": {
+        "matchingRules": {
+          "query": {
+            "planetId": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "\\d*"
+                }
+              ]
+            }
+          }
+        },
+        "method": "GET",
+        "path": "/spaceships",
+        "query": {
+          "planetId": [
+            "1"
+          ]
+        }
+      },
+      "response": {
+        "body": [
+          {
+            "id": 123,
+            "name": "X-Wing"
+          }
+        ],
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "matchingRules": {
+          "body": {
+            "$": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 1
+                }
+              ]
+            },
+            "$[*].id": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "number"
+                }
+              ]
+            },
+            "$[*].name": {
+              "combine": "AND",
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ]
+            }
+          }
+        },
+        "status": 200
+      }
+    }
+  ],
+  "metadata": {
+    "pact-jvm": {
+      "version": "4.3.5"
+    },
+    "pactSpecification": {
+      "version": "3.0.0"
+    }
+  },
+  "provider": {
+    "name": "spaceships-rest"
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "consumer": {
+    "name": "frontend-rest"
+  },
+  "provider": {
+    "name": "persons-rest"
+  },
+  "interactions": [
+    {
+      "description": "a request for persons",
+      "providerState": "i have a list of persons",
+      "request": {
+        "method": "GET",
+        "path": "/persons"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "body": [
+          {
+            "id": 1,
+            "name": "test",
+            "image": "https://testhost.de/image.png"
+          }
+        ],
+        "matchingRules": {
+          "$.body": {
+            "min": 1
+          },
+          "$.body[*].*": {
+            "match": "type"
+          },
+          "$.body[*].image": {
+            "match": "regex",
+            "regex": "https?:\\/\\/(www.)?.*"
+          }
+        }
+      }
+    },
+    {
+      "description": "a request for persons on planetId",
+      "providerState": "i have a list of persons",
+      "request": {
+        "method": "GET",
+        "path": "/persons",
+        "query": "planetId=1",
+        "matchingRules": {
+          "$.query.planetId[0]": {
+            "match": "regex",
+            "regex": "d*"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "body": [
+          {
+            "id": 1,
+            "name": "test",
+            "image": "https://testhost.de/image.png"
+          }
+        ],
+        "matchingRules": {
+          "$.body": {
+            "min": 1
+          },
+          "$.body[*].*": {
+            "match": "type"
+          },
+          "$.body[*].image": {
+            "match": "regex",
+            "regex": "https?:\\/\\/(www.)?.*"
+          }
+        }
+      }
+    },
+    {
+      "description": "a request for persons",
+      "providerState": "i have no persons",
+      "request": {
+        "method": "GET",
+        "path": "/persons"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        "body": [
+
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "2.0.0"
+    }
+  }
+}

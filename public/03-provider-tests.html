@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>PACT WARS</title>
+    <link rel="icon" sizes="196x196" href="assets/favicon.webp">
+    <link href="assets/pages.css" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <h1 class="title">PACT WARS</h1>
+        <h2 class="subtitle">Provider Tests</h2>
+    </header>
+    <img class="logo" src="assets/logo_cofinpro.svg">
+    <div>
+        <div class="zitat-div" style="margin-right: 5em;">
+            <div class="zitat-thumb"><img src="assets/img/person_1.png"></div>
+            <div class="zitat-text">
+                <p class="zitat-spruch">&bdquo;Ich finde ihren Mangel an Glauben beklagenswert&rdquo;</p>
+                <p class="zitat-author">&ndash; Darts Evader</p>
+            </div>
+        </div>
+        <h1>Provider-Test Ablauf</h1>
+        <section>
+            <ol>
+                <li>Contracts werden von au&szlig;en geladen <br> (JSON-Datei, aus externe Quelle wie eine
+                    Datei/Verzeichnis, URL, Pact-Broker...)</li>
+            </ol>
+            <p>F&uuml;r jede Interaction im Contract</p>
+            <ol start="2">
+                <li>Der State wird im Provider konfiguriert/gesetzt</li>
+                <li>Der Mock-Consumer feuert den Request wie im Contract beschrieben gegen den Provider</li>
+                <li>Der Mock-Consumer pr&uuml;ft die Response vom Provider und stellt sicher dass sie den Contract
+                    entspricht</li>
+            </ol>
+            <p>Am Ende aller Tests</p>
+            <ol start="5">
+                <li>(Optional) Die Ergebnisse werden publiziert (CI/CD Step)</li>
+            </ol>
+
+            <em>Hinweis:</em> ein Provider muss f&uuml;r den Test laufen!
+
+            <img src="assets/img/03-provider-test-ablauf.png">
+
+        </section>
+    </div>
+
+    <div>
+        <h1>Scope von Provider-Tests</h1>
+        <p>Offene Diskussion: je nachdem was man alles mittesten m&ouml;chte:</p>
+        <section>
+            <h2>Integration-Test Variante: testen auf Umgebung</h2>
+            <ul>
+                <li>Provider ist auf Umgebung deployt</li>
+                <li>Test startet extern &uuml;ber ein Tool (maven-plugin, pact-cli)</li>
+                <li>L&auml;uft <strong>NICHT</strong> als Unit-Test! (nicht zur Build-Zeit)</li>
+                <li>State muss &uuml;ber dedizierte REST-Aufrufe gesetzt werden
+                    <ul>
+                        <li>ggfs. muss der State aufger&auml;umt werden</li>
+                        <li>ggfs. muss Production-Code f&uuml;r Tests ge&auml;ndert werden</li>
+                    </ul>
+                </li>
+            </ul>
+            <img src="assets/img/03-umgebung.png">
+
+            <p><em>Empfehlung:</em> nicht machen.</p>
+            <ul>
+                <li>Geht in Richtung E2E-Tests: testet viel mehr als nur die Schnittstelle</li>
+                <li>L&auml;uft nicht zur Build-Zeit, sondern zur Laufzeit</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Unit-Test Variante mit kompletten Service</h2>
+            <ul>
+                <li>Ein Service wird im Unit-Test komplett gestartet (z.B. &quot;@SpringBootTest&quot; oder Arquillian)</li>
+                <li>Gemockt werden nur die externen Abh&auml;ngigkeiten (Clients), bzw. Datenbank (in-memory DB)</li>
+                <li>State wird programmatisch in die Datenbank (bzw. Mock) gesetzt</li>
+            </ul>
+
+            <p><em>Idee:</em> die Antwort zu einem Call kann von Logik weiter unten im Service abh&auml;ngen</p>
+            <p>Siehe: <a href="https://docs.pact.io/getting_started/testing-scope">Testing-Scope</a></p>
+
+            <img src="assets/img/03-service.png">
+
+            <p><em>Empfehlung:</em> mit Bedacht machen.</p>
+            <ul>
+                <li>Macht die Tests schwer und langsam</li>
+                <li>Testet nicht nur die Schnittstelle, sondern auch Service-Funktionalit&auml;t</li>
+                <li>Macht die Tests br&uuml;chig: Bug in der Service-Funktionalit&auml;t wird als Contract-Bruch ausgewertet</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Unit-Test Variante nur mit Schnittstelle</h2>
+            <ul>
+                <li>Ein Service wird im Unit-Test nur mit dem REST-Interface gestartet (z.B. &quot;@WebMvcTest&quot; oder reiner Undertow)</li>
+                <li>Gemockt wird die komplette Service-Logik (nur die REST-Klassen werden getestet)</li>
+                <li>State wird programmatisch in den Mocks gesetzt</li>
+            </ul>
+
+            <p><em>Idee:</em> nur die Schnittstelle testen &ndash; kein Contract-Bruch bei einem Fehler in der Service-Logik melden</p>
+
+            <img src="assets/img/03-schnittstelle.png">
+
+            <p><em>Empfehlung:</em> gute Wahl in Kombination mit getrennten Service-Tests.</p>
+            <ul>
+                <li>Tests sind schnell uns stabil</li>
+                <li>Testet nur die Schnittstelle, keine Service-Funktionalit&auml;t und keine Integration</li>
+                <li>Getrennte Komponenten-Tests zum Testen von Service-Funktionalit&auml;t (&quot;@SpringBoot&quot; bzw.
+                    Arquillian etc.)</li>
+            </ul>
+        </section>
+    </div>
+    <div>
+        <h1>Provider-Test Aufbau</h1>
+        <section>
+            <h4>Ein Provider-Test muss</h4>
+            <ol>
+                <li>Contracts (Pacts) laden und filtern</li>
+                <li>Den Service starten (mit dem ausgew&auml;hlten Scope)</li>
+                <li>States setzen k&ouml;nnen (per Callback f&uuml;r jede Interaction)</li>
+                <li>Einen Test ausf&uuml;hren f&uuml;r jede Interaction (per &quot;@TestTemplate&quot; oder &auml;hnliches)</li>
+            </ol>
+
+            <p>
+                <em>Hinweis:</em> hier gehen wir von einem Unit-Test Scope aus
+                <br>
+                (mit laufendem Provider auf einer Umgebung werden keine Provider-Unit-Tests geschrieben)
+            </p>
+        </section>
+        <section>
+            <h2 class="pagebreak">1. Contracts laden und filtern</h2>
+            Vor der Testausf&uuml;hrung m&uuml;ssen die zum Provider passenden Contracts geladen werden
+            <ul>
+                <li>Aus Datei/Verzeichnis (&quot;@PactFolder&quot;)</li>
+                <li>Aus einer URL (&quot;@PactUrl&quot;)</li>
+                <li>Aus einem Pact-Broker (&quot;@PactBroker&quot;) &ndash; siehe: <a href="04-ci-cd.html">Pact in CI/CD</a></li>
+            </ul>
+            <p>Damit nur die Interactions ber&uuml;cksichtigt werden, die von der getesteten Service-Klasse bedient werden,
+                k&ouml;nnen die Interactions aus den Contracts mit &quot;@PactFilter&quot; gefiltert werden.</p>
+            <p>Zudem zu ber&uuml;cksichtigen: Konfiguration (Adressen), Authentifizierung, etc.</p>
+
+            <h3>Beispiel f&uuml;r Spring-Boot (nur Schnittstellen testen)</h3>
+            <pre>
+            <code class="language-java">
+        // No need for full Spring context of @SpringBootTest
+        @WebMvcTest
+        // Load contracts from PactBroker at localhost:8005
+        @PactBroker(host="localhost", port="8005")
+        // Load contracts for provider "planets-rest"
+        @Provider("planets-rest")
+        // Only interactions with path starting with "/planets"
+        @PactFilter(value = "^\\/planets.*", filter = 
+                InteractionFilter.ByRequestPath.class)
+        class PlanetsControllerTest {
+            </code>
+            </pre>
+        </section>
+        <section>
+            <h2>2. Service starten</h2>
+            <p>Der Service sollte in der &quot;BeforeAll&quot; Phase gestartet werden, und in der &quot;AfterAll&quot;
+                Phase gestoppt werden.
+                Manche Frameworks bieten hier Hilfe an. Zum Beispiel:</p>
+            <ul>
+                <li>Spring-Boot: &quot;@SpringBootTest&quot; oder &quot;@WebMvcTest&quot;</li>
+                <li>Quarkus: &quot;@QuarkusTest&quot; (verwendet aber einen eigenen Classloader, was zu Probleme f&uuml;hrt)</li>
+            </ul>
+            <p>Alternativ den Service h&auml;ndisch starten (z.B. mit Jetty oder Undertow)</p>
+
+            <p><em>Beachten:</em> PACT-Mock-Consumer muss die Adresse vom Service kennen (host & port)</p>
+
+            <h3 class="pagebreak">Beispiel f&uuml;r Spring-Boot (nur Schnittstellen testen)</h3>
+            <pre>
+            <code class="language-java">
+        // No need for full Spring context of @SpringBootTest
+        @WebMvcTest
+        // Other PACT/Mockito annotations...
+        class PlanetsControllerTest {
+
+            // We will send requests against our MockMvc
+            @Autowired
+            private MockMvc mockMvc;
+
+            // Tell Pact to fire requests against our MockMvc
+            @BeforeEach
+            void before(PactVerificationContext context) {
+                context.setTarget(new MockMvcTestTarget(mockMvc));
+            }
+            </code>
+            </pre>
+        </section>
+        <section>
+            <h2>3. States setzen</h2>
+            <p>Bei jeder Interaction (jedem Testlauf) wird ein Callback in der &quot;BeforeEach&quot; Phase mit dem
+                State-Namen aufgerufen (in Java: Methode mit Annotation &quot;@State&quot;).
+                Dabei muss der Test den State des laufenden Services &auml;ndern.</p>
+
+            <p>Der State kann direkt in der (ggfs. in-memory) Datenbank oder in Mocks der Daten-Schicht bzw. der
+                Funktions-Schicht ge&auml;ndert werden.</p>
+
+            <h3>Beispiel f&uuml;r Spring-Boot</h3>
+            <pre>
+            <code class="language-java">
+        // Mocking our repository out
+        @MockBean
+        private PlanetsRepository planetsRepository;
+
+        // This gets called when setting state with this name
+        @State("i have a list of planets")
+        void stateWithPlanets() {
+            when(planetsRepository.findAll()).thenReturn(List.of(
+                new Planet(1L, "Planet 1"),
+                new Planet(2L, "Planet 2"),
+                new Planet(3L, "Planet 3")
+            ));
+        }
+            </code>
+            </pre>
+        </section>
+        <section>
+            <h2 class="pagebreak">4. Test ausf&uuml;hren f&uuml;r jede Interaction</h2>
+            <p>F&uuml;r jede Interaction muss der Request abgefeuert werden, und die Antwort vom Service gepr&uuml;ft
+                werden. Meistens gen&uuml;gt hierf&uuml;r eine &quot;@TestTemplate&quot; Methode.</p>
+
+
+            <h3>Beispiel f&uuml;r Spring-Boot</h3>
+            <pre>
+            <code class="language-java">
+        @TestTemplate
+        @ExtendWith(PactVerificationInvocationContextProvider.class)
+        void pactVerificationTestTemplate(
+                PactVerificationContext context) {
+            // Trigger interaction and verify result
+            context.verifyInteraction();
+        }
+            </code>
+            </pre>
+
+            <p>Hier wird die Methode f&uuml;r jede Interaction aufgerufen (PactVerificationInvocationContextProvider).
+                <br> Im PactVerificationContext kann man die Verifizierung vom Mock-Consumer triggern.</p>
+        </section>
+    </div>
+    <nav>
+        <a class="button" href="02-consumer-tests.html">Zur&uuml;ck</a>
+        <a class="button" href="index.html">&Uuml;bersicht</a>
+        <a class="button" href="04-ci-cd.html">Weiter</a>
+    </nav>
+
+    <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@10.4.0/styles/androidstudio.min.css">
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@10.4.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</body>
+
+</html>

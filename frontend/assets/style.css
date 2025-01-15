@@ -1,0 +1,68 @@
+@font-face {
+    font-family: 'AnakinMono';
+    src: url('fonts/anakin-mono.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'StarJedi';
+    src: url('fonts/star-jedi.woff') format('woff');
+}
+
+:root {
+    --primary-color: #ffe400;
+    --secondary-color: #999;
+    --white-color: #fff;
+    --black-color: #000;
+    --background-color: #000;
+
+    --anakin-mono-font: AnakinMono, sans-serif;
+    --star-jedi-font: StarJedi, sans-serif;
+}
+
+body {
+    font-family: var(--anakin-mono-font);
+    color: var(--white-color);
+    background: url('stars-bg.jpg') center center;
+}
+
+header {
+    text-align: center;
+}
+
+h1 {
+    font-family: var(--star-jedi-font);
+    color: var(--primary-color);
+}
+
+a {
+    color: var(--white-color);
+}
+
+a:hover {
+    color: var(--primary-color);
+}
+
+.slider {
+	padding: 1rem;
+	display: flex;
+    overflow-x: scroll;
+    overflow-y: hidden;
+	scroll-padding: 0 50%;
+    scroll-snap-type: x mandatory;
+    
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.slider::-webkit-scrollbar {
+    display: none;
+}
+
+section {
+	scroll-snap-align: center;
+	display: inline-block;
+    height: 70vh;
+    min-width: 500px;
+	border-radius: 3px;
+    margin-right: 3rem;
+}

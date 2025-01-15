@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>PACT WARS</title>
+    <link rel="icon" sizes="196x196" href="assets/favicon.webp">
+    <link href="assets/pages.css" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <h1 class="title">PACT WARS</h1>
+        <h2 class="subtitle">Consumer Tests</h2>
+    </header>
+    <img class="logo" src="assets/logo_cofinpro.svg">
+    <div>
+        <div class="zitat-div" style="margin-right: 5em;">
+            <div class="zitat-thumb"><img src="assets/img/person_5.png"></div>
+            <div class="zitat-text">
+                <p class="zitat-spruch">&bdquo;Auch Sie werden sich mal irren und ich hoffe, ich werde es miterleben&rdquo;</p>
+                <p class="zitat-author">&ndash; Prinzessin Neia Morgana</p>
+            </div>
+        </div>
+
+        <h1>Consumer-Test Aufbau</h1>
+        <section>
+            <p>Ein Consumer-Test besteht aus zwei Teilen</p>
+            <ol>
+                <li>Definition der &quot;Interactions&quot;: welche Interaktionen zwischen dem Consumer und dem Provider getestet werden</li>
+                <li>Consumer-Test f&uuml;r jede &quot;Interaction&quot;: testet dass der Consumer die Interaktion korrekt ausf&uuml;hrt</li>
+            </ol>
+        </section>
+        <section>
+            <h2>Definition der Interactions</h2>
+            <ul>
+                <li>Eine Methode f&uuml;r jede Interaktion-Definition</li>
+                <li>Definition anhand spezifischer PACT-DSL (je nach Programmierungssprache)</li>
+            </ul>
+
+            <h3 class="pagebreak">Beispiel f&uuml;r Java</h3>
+            <pre>
+            <code class="language-java">
+    // Define interaction between spaceships-rest and planets-rest
+    @Pact(provider = "spaceships-rest", consumer = "planets-rest")
+    RequestResponsePact pactFetchExistingSpaceshipsOnPlanet(
+                PactDslWithProvider builder) {
+        return builder
+            .given("has ships on planet 1")
+            .uponReceiving("GET request to existing spaceships on planet 1")
+            .path("/spaceships")
+            .matchQuery("planetId", "\\d*", "1")
+            .method("GET")
+            .willRespondWith()
+            .status(200)
+            .headers(Collections.singletonMap(
+                "Content-Type", "application/json"))
+            .body(newJsonArrayMinLike(1, array -> array.object(spaceship -> {
+                    spaceship.numberType("id", 123L);
+                    spaceship.stringType("name", "Try-Fighter");
+            })).build()).toPact();}
+            </code>
+            </pre>
+
+            <h3>Die Interaction-Definition besteht aus</h3>
+            <dl>
+                <dt>State (&quot;given&quot;)</dt>
+                <dd>
+                    in welchem Zustand sich der Provider f&uuml;r diesen Test befindet.
+                    Erm&ouml;glicht das Testen von unterschiedlichem Verhalten bei verschiedenen Zust&auml;nden.
+                </dd>
+            </dl>
+            <dl>
+                <dt>Request (ab &quot;uponReceiving&quot;)</dt>
+                <dd>
+                    genaue Abfrage die vom Consumer abgefeuert wird.
+                </dd>
+            </dl>
+            <dl>
+                <dt>Response (ab &quot;willRespondWith&quot;))</dt>
+                <dd>
+                    minimale Struktur/Aufbau der vom Consumer erwarteten Antwort.
+                    Inklusive Beispiel-Werte, verwendet im Consumer-Test (&quot;Example&quot;, siehe &quot;Consumer-Test Ablauf&quot;).
+                </dd>
+            </dl>
+            <br>
+            <dl>
+                <dt>Postel&rsquo;s Law</dt>
+                <dd><q>Be conservative in what you send, be liberal in what you accept</q></dd>
+                <br>
+                <dd>Requests so exakt wie m&ouml;glich definieren</dd>
+                <dd>Responses so minimal/locker wie m&ouml;glich pr&uuml;fen (minimale Struktur, Datentypen, etc)</dd>
+                <br>
+                <dd>Siehe: <a href="https://docs.pact.io/getting_started/matching/#best-practice">PACT Best
+                        Practices</a>
+                </dd>
+            </dl>
+        </section>
+        <section>
+            <h2 class="pagebreak">Consumer-Test f&uuml;r jede Interaction</h2>
+            <ul>
+                <li>Definiert welche Interaction grade getestet wird.</li>
+                <li>Testen, dass der Service den Request feuert, wie in der Interaction definiert.</li>
+                <li>Testen, dass der Service mit der Antwort zurecht kommt, die in der Interaction definiert ist.</li>
+            </ul>
+
+            <h3>Beispiel f&uuml;r Java</h3>
+            <pre>
+            <code class="language-java">
+    @Test
+    @PactTestFor(pactMethod = "pactFetchExistingSpaceshipsOnPlanet")
+    void fetchExistingSpaceshipsOnPlanet() { 
+        List&ltSpaceship&gt spaceships = 
+                spaceshipsClient.getSpaceshipsOnPlanet(1);
+        assertThat(spaceships.size()).isEqualTo(1);
+        assertThat(spaceships.get(0).getId()).isEqualTo(123L);
+        assertThat(spaceships.get(0).getName()).isEqualTo("Try-Fighter");
+    }
+            </code>
+            </pre>
+
+            <h3>Scope von Consumer-Tests</h3>
+            <p><em>Empfehlung:</em> nur die Schnittstelle testen (nur die &quot;Client&quot;-Klasse testen, alles andere
+                weg-mocken).</p>
+            <p>Man kann auch mehr testen (eher Richtung E2E-Test).</p>
+            <p>Siehe: <a href="https://docs.pact.io/getting_started/testing-scope">Testing Scope</a></p>
+        </section>
+    </div>
+
+    <div>
+        <h1>Consumer-Test Ablauf</h1>
+        <section>
+            <p>In der &quot;Before-All&quot; Phase</p>
+            <ol>
+                <li>Mock-Provider starten (l&auml;uft im localhost)</li>
+            </ol>
+            <p>Dann f&uuml;r jede Interaction (jeder Test)</p>
+            <ol start="2">
+                <li>In der &quot;Before-Each&quot; Phase, die Interaction (inkl. State) im Mock-Provider setzen/konfigurieren</li>
+                <li>Den Test ausf&uuml;hren</li>
+                <ol type="a">
+                    <li>Consumer feuert Request: Mock-Provider pr&uuml;ft ob Request zum Contract passt</li>
+                    <li>Mock-Provider antwortet mit der Response aus dem Contract (mit gesetzten &quot;Example&quot; Werten oder
+                        mit randomischen Werten)</li>
+                    <li>Test verarbeitet und pr&uuml;ft die Antwort</li>
+                </ol>
+            </ol>
+            <p>In der &quot;After-All&quot; Phase</p>
+            <ol start="4">
+                <li>Mock-Provider stoppen</li>
+                <li>Definition aller Interactions in einen Contract speichern <br>
+                    (JSON-Datei im &quot;target&quot; Verzeichnis, sprachunabh&auml;ngiges PACT-eigenes Format)</li>
+            </ol>
+
+            <img src="assets/img/02-consumer-test-ablauf.png">
+
+            <em>Hinweis:</em> der Consumer-Test an sich erzeugt den Contract nur (JSON-Datei), publiziert den aber nicht! 
+            <p>Siehe: <a href="04-ci-cd.html">Pact in CI/CD</a></p>
+
+            <h3>Beispiel-Konfiguration f&uuml;r Spring-Boot</h3>
+            <pre>
+            <code class="language-java">
+    // Tell Spring where to call pact mock-provider
+    @RestClientTest(
+        properties = "spaceships.baseurl:http://localhost:49635",
+        components = SpaceshipsClient.class)
+    // We injected a RestTemplate directly
+    @AutoConfigureWebClient(registerRestTemplate=true)
+    // Do NOT start a Mock Server from Sprint, we have a Pact one
+    @AutoConfigureMockRestServiceServer(enabled = false)
+    // Use Pact consumer extension
+    @ExtendWith(PactConsumerTestExt.class)
+    // Tell Pact where to run mock-provider
+    @PactTestFor(providerName = "spaceships-rest", port = "49635")
+    class SpaceshipsClientTest {
+            </code>
+            </pre>
+        </section>
+    </div>
+    <nav>
+        <a class="button" href="01-was-ist-pact.html">Zur&uuml;ck</a>
+        <a class="button" href="index.html">&Uuml;bersicht</a>
+        <a class="button" href="03-provider-tests.html">Weiter</a>
+    </nav>
+
+    <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@10.4.0/styles/androidstudio.min.css">
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@10.4.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</body>
+
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>PACT WARS</title>
+    <link rel="icon" sizes="196x196" href="assets/favicon.webp">
+    <link href="assets/pages.css" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <h1 class="title">PACT WARS</h1>
+        <h2 class="subtitle">Was ist PACT</h2>
+    </header>
+    <img class="logo" src="assets/logo_cofinpro.svg">
+    <div>
+        <h1>Schnittstellen Test</h1>
+        <section>
+            <p>Eine Schnittstelle existiert zwischen mindestens Zwei Komponenten</p>
+            <ul>
+                <li>Consumer (client) &ndash; benutzt die Schnittstelle</li>
+                <li>Provider (server) &ndash; bietet die Schnittstelle an</li>
+            </ul>
+
+            <q>Schnittstellen zu testen bedeuten die Kommunikation zwischen Komponenten zu testen.
+               Dies ERFORDERT EINEN INTEGRATIONS-TEST</q>
+        </section>
+        <section>
+            <h2>Manueller Test</h2>
+            <div class="zitat-div">
+                <div class="zitat-thumb"><img src="assets/img/person_5.png"></div>
+                <div class="zitat-text">
+                    <p class="zitat-spruch">&bdquo;Da lasse ich mich lieber von einem Wookiee k&uuml;ssen&rdquo;</p>
+                    <p class="zitat-author">&ndash; Prinzessin Neia Morgana</p>
+                </div>
+            </div>
+
+            <p>Die Komponenten sind auf einer Umgebung deployed und ein Tester klickt sich durch die Anwendung</p>
+
+            <img src="assets/img/01-manueller-test.png">
+        </section>
+        <section>
+            <h2 class="pagebreak">End-To-End Tests (E2E)</h2>
+            <div class="zitat-div">
+                <div class="zitat-thumb"><img src="assets/img/person_1.png"></div>
+                <div class="zitat-text">
+                    <p class="zitat-spruch">&bdquo;Seien sie nicht allzu Stolz auf ihr technologisches Schreckgespenst&rdquo;</p>
+                    <p class="zitat-author">&ndash; Darts Evader</p>
+                </div>
+            </div>
+
+            <p>Ein Automat ersetzt den Tester</p>
+
+            <img src="assets/img/01-e2e-test.png">
+
+            <ul>
+                <li>Die Komponenten m&uuml;ssen weiterhin auf einer Umgebung deployed sein</li>
+                <li>Test beinhaltet die komplette Anwendung + Logik: kein reiner Schnittstellen-Test</li>
+                <li>E2E-Tests sind aufwendig, komplex, langsam und fehleranf&auml;llig (nur die Spitze der Test-Pyramide)</li>
+                <li>Besser w&auml;re jede Komponente isoliert zu testen</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Contract-Testing</h2>
+            <div class="zitat-div">
+                <div class="zitat-thumb"><img src="assets/img/person_1.png"></div>
+                <div class="zitat-text">
+                    <p class="zitat-spruch">&bdquo;Der Kreis schliesst sich&rdquo;</p>
+                    <p class="zitat-author">&ndash; Darts Evader</p>
+                </div>
+            </div>
+
+            <p>Idee: die Schnittstelle wird in einem &quot;Vertrag&quot; (Contract) beschrieben</p>
+            <p>Consumer UND Provider verpflichten sich, den &quot;Contract&quot; einzuhalten</p>
+
+            <img src="assets/img/01-contract-test.png">
+
+            <ul>
+                <li>Jede Komponente kann ISOLIERT getestet werden</li>
+                <li>Muss <strong>NICHT</strong> auf einer Umgebung deployt werden</li>
+                <li>Man kann Teile der Komponente mocken, und nur die Schnittstelle testen</li>
+                <li>Tests sind schnell = fr&uuml;hes Feedback</li>
+                <li>Komplexit&auml;t geringer als E2E (aber auch nicht trivial)</li>
+
+                <p>Offene Frage: wo kommt der Contract her?</p>
+            </ul>
+        </section>
+    </div>
+
+    <div>
+        <h1>Contract Generierung</h1>
+        <section>
+            <h2>Provider-First (der Standard)</h2>
+            <div class="zitat-div">
+                <div class="zitat-thumb"><img src="assets/img/person_2.png"></div>
+                <div class="zitat-text">
+                    <p class="zitat-spruch">&bdquo;Ich habe da ein ganz mieses Gef&uuml;hl&rdquo;</p>
+                    <p class="zitat-author">&ndash; Duke Guystalker</p>
+                </div>
+            </div>
+
+            <ol>
+                <li>Provider (Service) schreiben</li>
+                <li>Contract automatisch generieren - z.B. Swagger</li>
+                <li>Consumer (Client) schreiben - ggfs. aus Contract generieren</li>
+                <li>Provider-Test schreiben - meistens auch ganz ohne Contract-Pr&uuml;fung, z.B. RestAssured</li>
+                <li>Consumer-Test schreiben - wird kaum gemacht</li>
+            </ol>
+
+            <img src="assets/img/01-provider-first.png">
+
+            <ul>
+                <li>Consumer-Team hat wenig Einfluss auf die Schnittstelle/API (keine ma&szlig;geschneiderte API)</li>
+                <li>Es entstehen generische Schnittstellen: mehr Kopplung in Microservices-Systemen</li>
+                <li>Provider-Team kann Contract &auml;ndern: Consumer-Team ist schlecht gesch&uuml;tzt gegen
+                    Breaking-Changes in der API</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Contract-First</h2>
+            <div class="zitat-div">
+                <div class="zitat-thumb"><img src="assets/img/person_4.png"></div>
+                <div class="zitat-text">
+                    <p class="zitat-spruch">&bdquo;Hallo, wie geht&rsquo;s denn so&rdquo;</p>
+                    <p class="zitat-author">&ndash; Toby-Rhuan Shenobi</p>
+                </div>
+            </div>
+
+            <ol>
+                <li>Contract schreiben (wer schreibt den?)</li>
+                <li>Provider schreiben (Service), wird meistens aus dem Contract generiert (z.B.
+                    Swagger-Codegen)</li>
+                <li value="2">Consumer schreiben (Client), wird meistens aus dem Contract generiert (z.B.
+                    Swagger-Codegen)</li>
+                <li>Provider-Test schreiben (meistens auch ganz ohne Contract-Pr&uuml;fung, z.B.
+                    RestAssured)</li>
+                <li value="3">Consumer-Test schreiben - wird kaum gemacht</li>
+            </ol>
+
+            <img src="assets/img/01-contract-first.png">
+
+            <ul>
+                <li>Idee: Contract wird von beiden Teams zusammen geschrieben. Anschlie&szlig;end k&ouml;nnen die Teams
+                    unabh&auml;ngig voneinander weiterentwickeln.</li>
+                <li>Realit&auml;t: meistens kommt der Contract vom Provider-Team. Dann ist es effektiv ein
+                    Provider-First Ansatz.
+                </li>
+                <li>Bleibt das Koordinationsproblem: nutzen die Teams dieselbe Version vom Contract? Dann existiert weiterhin kein ausreichender Schutz gegen Breaking-Changes in der API.</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Consumer-First (&quot;Consumer Driven&quot;)</h2>
+            <div class="zitat-div">
+                <div class="zitat-thumb"><img src="assets/img/person_1.png"></div>
+                <div class="zitat-text">
+                    <p class="zitat-spruch">&bdquo;Sie haben mich das letzte mal entt&auml;uscht, admiral&rdquo;</p>
+                    <p class="zitat-author">&ndash; Darts Evader</p>
+                </div>
+            </div>
+
+            <ol>
+                <li>Consumer (Client) schreiben</li>
+                <li>Consumer-Test schreiben</li>
+                <li>Contract generieren &ndash; automatisch beim Ausf&uuml;hren des Consumer-Tests</li>
+                <li>Provider (Service) schreiben</li>
+                <li>Provider-Test schreiben &ndash; pr&uuml;ft den Provider gegen&uuml;ber den Contract</li>
+            </ol>
+
+            <img src="assets/img/01-consumer-first.png">
+
+            <ul>
+                <li>Idee: Consumer definiert seine genauen Anforderungen an die Schnittstelle</li>
+                <li>Provider kann andere Teile der Schnittstelle &auml;ndern ohne den Consumer zu brechen (anders als
+                    bei statischen vollst&auml;ndigen Contracts wie Swagger)</li>
+                <li>Tendenz zu dedizierten Schnittstellen: mehr Entkopplung der Microservices</li>
+                <li>Provider kann keine neue Contract-Versionen selbstst&auml;ndig erstellen: besseren Schutz f&uuml;r
+                    den Consumer gegen Breaking-Changes in API</li>
+                <li>Problem: Consumer-Team kann Contract &auml;ndern und damit Provider-Test brechen lassen. Die PACT-L&ouml;sung hierf&uuml;r sind pending pacts (siehe den CI/CD Abschnitt).</li>
+            </ul>
+        </section>
+        <section>
+            <h3>Mehrere Consumer</h3>
+            <ul>
+                <li>Meistens hat ein Provider mehr als einen Consumer</li>
+                <li>Welcher Consumer erstellt dann den Contract?</li>
+                <li>Antwort: jeder erstellt seinen <strong>EIGENEN</strong> Contract</li>
+            </ul>
+
+            <img src="assets/img/01-mehrere-consumer.png">
+
+            <ul>
+                <li>Contracts definieren nur Teile der API die ein spezifischer Consumer wirklich ben&ouml;tigt</li>
+                <li>Der Provider kann andere Teile der API &auml;ndern ohne den Consumer zu brechen (anders als bei
+                    statischen vollst&auml;ndigen Contracts wie Swagger)</li>
+                <li>Provider muss <strong>JEDEN</strong> Contract zu seiner API erf&uuml;llen</li>
+                <li>Bei dedizierten Schnittstellen meistens getrennte Tests</li>
+                <li>Bei geteilten Schnittstellen: verifiziert ein Test alle Contracts</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Wann lohnt sich Consumer-Driven-Contract-Testing</h2>
+            <div class="zitat-div">
+                <div class="zitat-thumb"><img src="assets/img/person_1.png"></div>
+                <div class="zitat-text">
+                    <p class="zitat-spruch">&bdquo;Achten sie darauf, nicht an ihrem Ehrgeiz zu ersticken&rdquo;</p>
+                    <p class="zitat-author">&ndash; Darts Evader</p>
+                </div>
+            </div>
+
+            <ul>
+                <li>Team/Organisation hat Kontrolle &uuml;ber Consumer UND Provider (nicht gut f&uuml;r PUBLIC API)</li>
+                <li>Feature-Orientierung &ndash; Consumer definiert Anforderungen</li>
+                <li>Viele system-interne Schnittstellen</li>
+                <li>Perfekt f&uuml;r Microservice Architektur</li>
+            </ul>
+        </section>
+    </div>
+
+    <div>
+        <h1>PACT Framework</h1>
+        <section>
+            <p>Pact ist ein Code-First &quot;Consumer-Driven-Contract-Testing&quot; Tool</p>
+            <ul>
+                <li>Contracts werden beim Ausf&uuml;hren der Consumer-Tests &quot;aufgenommen&quot;</li>
+                <li>Tooling f&uuml;r mehrere Sprachen verf&uuml;gbar (Java, JavaScript, .NET, Python, Go, Swift, Ruby, PHP, ...)</li>
+                <li>CLI-Tools verf&uuml;gbar f&uuml;r Anwendung in Pipelines</li>
+                <li>Pact-Broker als Contract-Management Tool (steuert Versionierung und Verifizierung der Contracts)</li>
+            </ul>
+
+            <p><a href="https://docs.pact.io/">PACT Docs</a></p>
+        </section>
+    </div>
+    <nav>
+        <a class="button" href="index.html">&Uuml;bersicht</a>
+        <a class="button" href="02-consumer-tests.html">Weiter</a>
+    </nav>
+</body>
+
+</html>

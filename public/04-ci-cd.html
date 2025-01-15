@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>PACT WARS</title>
+    <link rel="icon" sizes="196x196" href="assets/favicon.webp">
+    <link href="assets/pages.css" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <h1 class="title">PACT WARS</h1>
+        <h2 class="subtitle">CI / CD</h2>
+    </header>
+    <img class="logo" src="assets/logo_cofinpro.svg">
+    <div>
+        <div class="zitat-div" style="margin-right: 5em;">
+            <div class="zitat-thumb"><img src="assets/img/person_3.png"></div>
+            <div class="zitat-text">
+                <p class="zitat-spruch">&bdquo;Viel zu lernen du noch hast&rdquo;</p>
+                <p class="zitat-author">&ndash; Master Yodler</p>
+            </div>
+        </div>
+        <h1>Contracts verteilen</h1>
+        <section>
+            <p>Der Provider-Build muss sich die Pacts (JSON-Dateien) irgendwo holen.</p>
+
+            <p>Alternativen zum Verteilen der Pacts:</p>
+            <ol>
+                <li>Consumer CI-Build macht ein Commit mit dem Pact direkt in den Provider-Repo (z.B. GitLab)</li>
+                <li>Pacts als versionierte Artefakte publizieren (z.B. ins Nexus) &ndash; Provider-Build kann die daraus holen (URL)</li>
+                <li>Pacts ins Version-Control vom Consumer committen (z.B. GitLab) &ndash; Provider muss die daraus holen (Tags/Branches)</li>
+                <li>Dediziertes Tool verwenden: Pact-Broker (bzw. Pactflow als kommerzielle L&ouml;sung)</li>
+            </ol>
+
+        </section>
+    </div>
+
+    <div>
+        <h1>Vorteile vom Pact-Broker</h1>
+        <section>
+            <ul>
+                <li>Versionierung von Consumer, Provider und Contracts (Pacts)</li>
+                <li>Tagging von Consumer/Provider Versionen</li>
+                <li>Webhooks f&uuml;r CI/CD Pipelines</li>
+                <li>CLI-Client f&uuml;r alle Pact-Operationen in CI/CD Pipelines</li>
+                <li>R&uuml;ckw&auml;rtskompatibilit&auml;t gew&auml;hrleisten (testen zwischen verschiedenen Consumer/Provider Versionen)</li>
+                <li>Visualisierung von Schnittstellen zwischen Komponenten/Services und Verifizierungsergebnissen</li>
+                <li>Kompatibilit&auml;t-Matrix und &quot;can-i-deploy&quot; Tool um zu garantieren dass nur kompatible Kombinationen von Consumer und Provider deployt werden</li>
+                <li>Features wie Pending-Pacts und WIP-Pacts</li>
+                <li>RESTful API</li>
+            </ul>
+
+            <p>Siehe: <a href="https://docs.pact.io/pact_broker">PACT-Broker</a></p>
+        </section>
+        <section>
+            <h2>PACT-Broker</h2>
+            
+            <img src="assets/img/04-pact-broker.png">
+        </section>
+    </div>
+
+    <div>
+        <h1 class="pagebreak">Pact in den Pipelines</h1>
+        <div class="zitat-div" style="margin-right: 5em;">
+            <div class="zitat-thumb"><img src="assets/img/person_7.png"></div>
+            <div class="zitat-text">
+                <p class="zitat-spruch">&bdquo;Waaawwuuuaaaahhhhh&rdquo;</p>
+                <p class="zitat-author">&ndash; Chewbaraca</p>
+            </div>
+        </div>
+        <p>Siehe: <a href="https://docs.pact.io/pact_nirvana">PACT Nirvana</a></p>
+        <section>
+            <h2>Consumer Pipeline</h2>
+            
+            <p>In einer ersten Version, wird die Consumer-Pipeline mit einem Schritt (Stage) erg&auml;nzt, der folgendes tut:</p>
+            <ol>
+                <li>Consumer-Tests ausf&uuml;hren</li>
+                <li>Pacts zum Broker publizieren (nur bei Test-Erfolg)</li>
+            </ol>
+
+            <h3>Beispiel publish Befehl mit pact-broker cli</h3>
+            <pre>
+            <code class="language-bash">
+        pact-broker publish build/pacts \
+        --broker-base-url=http://localhost:8005 \
+        --consumer-app-version=${gitsha} \
+        --tag-with-git-branch   
+            </code>
+            </pre>
+
+            <img src="assets/img/04-consumer-build-pipeline.png">
+        </section>
+        <section>
+            <h2 class="pagebreak">Provider Pipeline</h2>
+
+            <p>In einer ersten Version wird die Provider-Pipeline mit einem Schritt (Stage) erg&auml;nzt, der folgendes tut:</p>
+            <ol>
+                <li>Laden von Pacts aus dem Broker</li>
+                <li>Ausf&uuml;hren der Tests</li>
+                <li>Publizierung der Test-Ergebnisse zum Broker</li>
+            </ol>
+            
+            <p>Mit JVM &uuml;bernimmt die Pact-Provider-Junit Extension alle diese Aufgaben (Annotation &quot;@PactBroker&quot;).</p>
+
+            <img src="assets/img/04-provider-build-pipeline.png">
+        </section>
+        <section>
+            <h2>Verifizierung mit Webhook</h2>
+            <ul>
+                <li>Bei &Auml;nderungen im Consumer (Pact ge&auml;ndert) muss der Pact nochmal verifiziert werden</li>
+                <li>Webhook im Pact-Broker daf&uuml;r (contract content changed event)</li>
+            </ul>
+
+            <p>Zwei M&ouml;glichkeiten:</p>
+            <ul>
+                <li>Die normale Provider-Pipeline nochmal ansto&szlig;en</li>
+                <li>Eine dedizierte Pact-Verifizierung Pipeline des Providers ansto&szlig;en</li>
+            </ul>
+            
+            <p>Eine dedizierte Provider-Verification Pipeline:</p>
+            <ul>
+                <li>F&uuml;hrt nur die Pact-Provider Tests aus</li>
+                <li>Filtert: verifiziert nur den ge&auml;nderten Pact bzw. Consumer</li>
+            </ul>
+
+            <img src="assets/img/04-consumer-build-pipeline-provider-verifizierung.png">       
+        </section>
+        <section>
+            <h2>Consumer wartet auf Verifizierung</h2>
+
+            <p>Die Consumer-Pipeline kann noch erg&auml;nzt werden:</p>
+            <ul>
+                <li>Wartet auf die Verifizierung vom Provider (&uuml;ber Webhook)</li>
+                <li>Pipeline deployt und ist erfolgreich NUR wenn Verifizierung erfolgreich</li>
+            </ul>
+            
+            <img src="assets/img/04-consumer-build-pipeline-provider-verifizierung-2.png">                
+        </section>
+        <section>
+            <h2>CD-Pipelines mit &quot;can-i-deploy&quot;</h2>
+
+            <p>Weitere Erg&auml;nzungen in Consumer- und Provider-Pipelines:</p>
+            <ul>
+                <li>Consumer/Provider Versionen werden beim Deployment mit Umgebungs-Tag im Broker getaggt (&quot;test&quot; / &quot;prod&quot;)</li>
+                <li>&Uuml;ber den &quot;can-i-deploy&quot; Tool von Pact kann man &uuml;berpr&uuml;fen ob der Consumer kompatibel ist zur aktuell auf der Umgebung deployte Version vom Provider (oder umgekehrt)</li>
+                <li>Nur kompatible Versionen von Komponenten werden deployt (&quot;Pact-Nirvana&quot;)</li>
+            </ul>
+
+            <img src="assets/img/04-can-i-deploy-consumer.png">
+            <img src="assets/img/04-can-i-deploy-provider.png">
+        </section>
+    </div>
+    <nav>
+        <a class="button" href="03-provider-tests.html">Zur&uuml;ck</a>
+        <a class="button" href="index.html">&Uuml;bersicht</a>
+        <a class="button" href="05-organisation.html">Weiter</a>
+    </nav>
+
+    <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets@10.4.0/styles/androidstudio.min.css">
+    <script src="https://unpkg.com/@highlightjs/cdn-assets@10.4.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</body>
+
+</html>

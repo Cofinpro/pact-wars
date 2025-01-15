@@ -1,0 +1,184 @@
+@font-face {
+    font-family: 'AnakinMono';
+    src: url('fonts/anakin-mono.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'StarJedi';
+    src: url('fonts/star-jedi.woff') format('woff');
+}
+
+@font-face {
+    font-family: 'StarJediHollow';
+    src: url('fonts/star-jedi-hollow.woff') format('woff');
+}
+
+:root {
+    --primary-color: #1e1e1e;
+    --secondary-color: #999;
+    --white-color: #d4d4d4;
+    --black-color: #000;
+    --background-color: #fff;
+    --yellow-color: #a59400;
+
+    --anakin-mono-font: AnakinMono, sans-serif;
+    --star-jedi-font: StarJedi, sans-serif;
+    --star-jedi-hollow-font: StarJediHollow, sans-serif;
+    --default-font: arial, verdana, sans-serif;
+}
+
+body {
+    font-family: var(--default-font);
+    font-size: large;
+    color: var(--primary-color);
+    background: var(--background-color);
+    margin: auto;
+    max-width: 1200px;
+}
+
+header {
+    text-align: center;
+}
+
+h1 {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+h2 {
+    font-size: 1.6em;
+    font-weight: bold;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--primary-color);
+}
+
+nav {
+    text-align: center;
+    margin: 2em;
+}
+
+img {
+    display: block;
+    width: 60%;
+    margin: 2em auto;
+}
+
+section {
+    margin: 5em;
+}
+
+a {
+    color: var(--yellow-color);
+}
+
+a:hover {
+    color: var(--primary-color);
+}
+
+em {
+    color: var(--primary-color);
+}
+
+.title {
+    font-family: var(--star-jedi-font);
+    color: var(--yellow-color);
+    font-size: 3em;
+}
+
+.subtitle {
+    font-weight: bold;
+    font-size: 2.4em;
+}
+
+.button {
+	background-color: var(--yellow-color);
+	border-radius:28px;
+	border:1px solid var(--primary-color);
+	display: inline-block;
+	cursor:pointer;
+	padding:12px 31px;
+    text-decoration:none;
+    color: var(--black-color);
+}
+
+.button:hover {
+    background-color: var(--secondary-color);
+    border:1px solid var(--secondary-color);
+}
+
+.button:active {
+	position:relative;
+	top:1px;
+}
+
+.logo {
+    position: absolute;
+    top: 2em;
+    right: 2em;
+    display: inline;
+    margin: 0;
+    width: auto;
+}
+
+.speakers {
+    display: flex;
+}
+
+.speaker {
+    flex: 1;
+}
+
+.speaker-img {
+    width: 150px;
+    margin: 0;
+}
+
+.zitat-div {
+    overflow: auto;
+    max-width: 30em;
+    margin-left: auto;
+    margin-right: 0;
+}
+
+.zitat-thumb {
+    float: right;
+}
+
+.zitat-thumb img {
+    width: 5em;
+    height: 5em;
+    display: block;
+    margin: 0;
+}
+
+.zitat-text {
+    margin-right: 5.5em;
+}
+
+.zitat-spruch {
+    font-family: var(--anakin-mono-font);
+    font-size: 0.9em;
+    text-align: right;
+}
+
+.zitat-author {
+    font-family: var(--default-font);
+    font-style: italic;
+    font-size: 0.9em;
+    text-align: right;
+}
+
+@media print {
+    .pagebreak {
+        clear: both;
+        page-break-before: always;
+    }
+    code {
+        font-size: medium;
+    }
+    .button {
+        display: none;
+    }
+}

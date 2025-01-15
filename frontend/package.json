@@ -1,0 +1,23 @@
+{
+  "name": "pact-wars-frontend",
+  "version": "1.0.0",
+  "description": "frontend for pact tests",
+  "author": "kevin.kessenich@cofinpro.de",
+  "license": "ISC",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --runInBand",
+    "publish:pact": "node ./publish.js"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.16.11",
+    "@pact-foundation/pact": "^9.17.2",
+    "babel-jest": "^27.5.1",
+    "jest": "^27.5.1",
+    "jest-pact": "^0.9.1",
+    "node-fetch": "^2.6.1"
+  }
+}

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>PACT WARS</title>
+    <link rel="icon" sizes="196x196" href="assets/favicon.webp">
+    <link href="assets/pages.css" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <h1 class="title">PACT WARS</h1>
+        <h2 class="subtitle">Organisation</h2>
+    </header>
+    <img class="logo" src="assets/logo_cofinpro.svg">
+    <div>
+        <div class="zitat-div" style="margin-right: 5em;">
+            <div class="zitat-thumb"><img src="assets/img/person_3.png"></div>
+            <div class="zitat-text">
+                <p class="zitat-spruch">&bdquo;Tue es oder tue es nicht.<br/>Es gibt kein Versuchen.&rdquo;</p>
+                <p class="zitat-author">&ndash; Master Yodler</p>
+            </div>
+        </div>
+        <h1>Stolpersteine bei Pact zwischen Teams</h1>
+        <section>
+            <h2>Pact-Tests werden nicht geschrieben (keine Zeit daf&uuml;r)</h2>
+            <ul>
+                <li>Pact-Tests in der Definition of Done aufnehmen</li>
+                <li>Pact-Tests im Abnahme-Prozess von User-Stories integrieren</li>
+            </ul>
+
+            <h2>Consumer-Tests werden geschrieben, Provider-Tests werden vernachl&auml;ssigt</h2>
+            <ul>
+                <li>Prozessl&ouml;sung &ndash; erfordert hohes Pact-Bewusstsein und Commitment im Projekt (auch von Product
+                    Owner und Management)</li>
+                <li>Durchsetzen &uuml;ber Pipeline &ndash; Consumer-Branch kann nicht gemerged werden bis er vom Provider
+                    verifiziert wurde</li>
+            </ul>
+
+            <h2>Fehlgeschlagene Verifizierungen werden ignoriert</h2>
+            <ul>
+                <li>Prozessl&ouml;sung &ndash; Erfordert hohes Pact-Bewusstsein und
+                    Commitment im Projekt (auch von Product Owner und Management)</li>
+                <li>Durchsetzen &uuml;ber Pipeline &ndash; &quot;can-i-deploy&quot; verwenden, Deployments nur bei erfolgreiche
+                    Verifizierung</li>
+            </ul>
+
+            <h2 class="pagebreak">Provider-Teams werden durch Consumer-&Auml;nderungen blockiert</h2>
+            <ul>
+                <li>Pipeline l&auml;uft nicht mehr durch weil Consumer-&Auml;nderungen eine erfolgreiche Verifizierung
+                    verhindern, Provider-Team ist blockiert bis die Problematik gel&ouml;st ist (inkl. Abstimmung mit
+                    Consumer-Team, etc.)</li>
+                <li>L&ouml;sung &uuml;ber Pending-Pacts Feature vom Pact-Broker: neue, nie verifizierte Pact-Versionen
+                    brechen den Provider-Build nicht (Verifizierung wird trotzdem als fehlgeschlagen publiziert)</li>
+            </ul>
+
+        </section>
+        <section>
+            <h2>WICHTIG: Miteinander REDEN ist weiterhin erforderlich!</h2>
+            <div class="zitat-div">
+                <div class="zitat-thumb"><img src="assets/img/person_4.png"></div>
+                <div class="zitat-text">
+                    <p class="zitat-spruch">&bdquo;Nun, wenn Droiden denken k&ouml;nnten, w&auml;re keiner von uns hier&rdquo;</p>
+                    <p class="zitat-author">&ndash; Toby-Rhuan Shenobi</p>
+                </div>
+            </div>
+        </section>
+    </div>
+    <nav>
+        <a class="button" href="04-ci-cd.html">Zur&uuml;ck</a>
+        <a class="button" href="index.html">&Uuml;bersicht</a>
+        <a class="button" href="impressium.html">Weiter</a>
+    </nav>
+</body>
+
+</html>

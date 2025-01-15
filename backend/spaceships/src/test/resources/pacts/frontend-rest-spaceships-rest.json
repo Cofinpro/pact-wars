@@ -1,0 +1,107 @@
+{
+  "consumer": {
+    "name": "frontend-rest"
+  },
+  "provider": {
+    "name": "spaceships-rest"
+  },
+  "interactions": [
+    {
+      "description": "a request for spaceships",
+      "providerState": "i have a list of spaceships",
+      "request": {
+        "method": "GET",
+        "path": "/spaceships"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": [
+          {
+            "id": 1,
+            "name": "test",
+            "description": "test",
+            "image": "https://testhost.de/image.png"
+          }
+        ],
+        "matchingRules": {
+          "$.body": {
+            "min": 1
+          },
+          "$.body[*].*": {
+            "match": "type"
+          },
+          "$.body[*].image": {
+            "match": "regex",
+            "regex": "https?:\\/\\/(www.)?.*"
+          }
+        }
+      }
+    },
+    {
+      "description": "a request for spaceships on planetId",
+      "providerState": "i have a list of spaceships",
+      "request": {
+        "method": "GET",
+        "path": "/spaceships",
+        "query": "planetId=1",
+        "matchingRules": {
+          "$.query.planetId[0]": {
+            "match": "regex",
+            "regex": "d*"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": [
+          {
+            "id": 1,
+            "name": "test",
+            "description": "test",
+            "image": "https://testhost.de/image.png"
+          }
+        ],
+        "matchingRules": {
+          "$.body": {
+            "min": 1
+          },
+          "$.body[*].*": {
+            "match": "type"
+          },
+          "$.body[*].image": {
+            "match": "regex",
+            "regex": "https?:\\/\\/(www.)?.*"
+          }
+        }
+      }
+    },
+    {
+      "description": "a request for spaceships",
+      "providerState": "i have no spaceships",
+      "request": {
+        "method": "GET",
+        "path": "/spaceships"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": [
+
+        ]
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "2.0.0"
+    }
+  }
+}

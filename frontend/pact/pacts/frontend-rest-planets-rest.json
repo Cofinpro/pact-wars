@@ -1,0 +1,108 @@
+{
+  "consumer": {
+    "name": "frontend-rest"
+  },
+  "provider": {
+    "name": "planets-rest"
+  },
+  "interactions": [
+    {
+      "description": "a request for planets",
+      "providerState": "i have a list of planets",
+      "request": {
+        "method": "GET",
+        "path": "/planets"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": [
+          {
+            "id": 1,
+            "name": "test",
+            "description": "test",
+            "image": "https://testhost.de/image.png"
+          }
+        ],
+        "matchingRules": {
+          "$.body": {
+            "min": 1
+          },
+          "$.body[*].*": {
+            "match": "type"
+          },
+          "$.body[*].image": {
+            "match": "regex",
+            "regex": "https?:\\/\\/(www.)?.*"
+          }
+        }
+      }
+    },
+    {
+      "description": "a request for planets",
+      "providerState": "i have no planets",
+      "request": {
+        "method": "GET",
+        "path": "/planets"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": [
+
+        ]
+      }
+    },
+    {
+      "description": "a post request to travel",
+      "providerState": "i have planet 1 with spaceship 2 and person 5",
+      "request": {
+        "method": "POST",
+        "path": "/planets/1/travel",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "spaceshipId": 2,
+          "toPlanetId": 3,
+          "personId": 5
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+        }
+      }
+    },
+    {
+      "description": "a post request to travel",
+      "providerState": "i have planet 1 without spaceship 2 or person 5",
+      "request": {
+        "method": "POST",
+        "path": "/planets/1/travel",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "spaceshipId": 2,
+          "toPlanetId": 3,
+          "personIds": 5
+        }
+      },
+      "response": {
+        "status": 400,
+        "headers": {
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "2.0.0"
+    }
+  }
+}
